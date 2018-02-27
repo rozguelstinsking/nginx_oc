@@ -1,0 +1,147 @@
+apiVersion: v1
+kind: DeploymentConfig
+metadata:
+  name: biocheck
+  namespace: biometricos-biocheck-dev
+  selfLink: /oapi/v1/namespaces/biometricos-biocheck-dev/deploymentconfigs/biocheck
+  uid: 5cf37cae-10d3-11e8-8006-fa163e607210
+  resourceVersion: '188305395'
+  generation: 14
+  creationTimestamp: '2018-02-13T15:34:21Z'
+  labels:
+    app: javase
+    app_name: biocheck
+    template: javase
+spec:
+  strategy:
+    type: Rolling
+    rollingParams:
+      updatePeriodSeconds: 1
+      intervalSeconds: 1
+      timeoutSeconds: 600
+      maxUnavailable: 25%
+      maxSurge: 25%
+    resources: {}
+    activeDeadlineSeconds: 21600
+  triggers:
+    - type: ConfigChange
+  replicas: 1
+  test: false
+  selector:
+    app_name: biocheck
+    deploymentconfig: biocheck
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app_name: biocheck
+        deploymentconfig: biocheck
+        template: javase
+    spec:
+      volumes:
+        - name: podinfo
+          downwardAPI:
+            items:
+              - path: labels
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.labels
+              - path: annotations
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.annotations
+            defaultMode: 420
+          metadata:
+            items:
+              - name: labels
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.labels
+              - name: annotations
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.annotations
+            defaultMode: 420
+      containers:
+        - name: biocheck
+          image: 'registry.global.paas.gsnetcloud.corp/produban/javase:1.4.10.RELEASE'
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          env:
+            - name: APP_NAME
+              value: biocheck
+            - name: ARTIFACT_URL
+              value: >-
+                https://serenity-nexus.alm.mx.corp/repository/maven-snapshots/com/biometricos/biocheck/biocheckservice/0.0.1-SNAPSHOT/biocheckservice-0.0.1-20180227.235644-1.jar
+            - name: PBD_URL
+            - name: JAVA_OPTS_EXT
+              value: >-
+                -Djava.security.egd=file:/dev/./urandom -XX:MaxRAM=1536m
+                -Xms512m
+            - name: JAVA_PARAMETERS
+            - name: PROJECT_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.namespace
+            - name: WILY_MOM_FQDN
+            - name: WILY_MOM_PORT
+              value: '5001'
+            - name: TZ
+              value: America/Mexico_City
+            - name: SPRING_CLOUD_CONFIG_URI
+              value: 'http://config-service:8080/'
+            - name: SPRING_CLOUD_CONFIG_LABEL
+              value: develop
+            - name: SPRING_CLOUD_CONFIG_FAILFAST
+              value: 'true'
+            - name: SPRING_APPLICATION_NAME
+              value: biocheck
+            - name: SERVER_PORT
+              value: '8080'
+            - name: LANG
+              value: en_US.utf8
+            - name: SPRING_PROFILES_ACTIVE
+              value: mx
+          resources:
+            limits:
+              memory: 1536Mi
+            requests:
+              memory: 512M
+          volumeMounts:
+            - name: podinfo
+              mountPath: /opt/metadata
+          terminationMessagePath: /dev/termination-log
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            capabilities: {}
+            privileged: false
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+status:
+  latestVersion: 6
+  observedGeneration: 14
+  replicas: 1
+  updatedReplicas: 1
+  availableReplicas: 1
+  unavailableReplicas: 0
+  details:
+    message: config change
+    causes:
+      - type: ConfigChange
+  conditions:
+    - type: Available
+      status: 'True'
+      lastUpdateTime: '2018-02-13T16:58:02Z'
+      lastTransitionTime: '2018-02-13T16:58:02Z'
+      message: Deployment config has minimum availability.
+    - type: Progressing
+      status: 'True'
+      lastUpdateTime: '2018-02-19T20:11:02Z'
+      lastTransitionTime: '2018-02-19T20:11:00Z'
+      reason: NewReplicationControllerAvailable
+      message: replication controller "biocheck-6" successfully rolled out
+  readyReplicas: 1
