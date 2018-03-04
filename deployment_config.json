@@ -1,0 +1,48 @@
+{
+  "kind": "DeploymentConfig",
+  "apiVersion": "v1",
+  "metadata": {
+    "name": "frontend"
+  },
+  "spec": {
+    "template": {
+      "metadata": {
+        "labels": {
+          "name": "frontend"
+        }
+      },
+      "spec": {
+        "containers": [
+          {
+            "name": "biocheck-front",
+            "image": "docker.io/rosker/biocheck-front"
+          }
+        ]
+      }
+    },
+    "replicas": 1,
+    "selector": {
+      "name": "frontend"
+    },
+    "strategy": {
+      "type": "Rolling",
+      "rollingParams": {
+        "pre": {
+          "failurePolicy": "Abort",
+          "execNewPod": {
+            "containerName": "helloworld", 
+            "command": [ 
+              "/usr/bin/echo", "arg1"
+            ],
+            "env": [ 
+              {
+                "name": "CUSTOM_VAR1",
+                "value": "custom_value1"
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}
