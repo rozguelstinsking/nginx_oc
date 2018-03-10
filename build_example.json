@@ -2,7 +2,7 @@
 	"kind": "BuildConfig",
 	"apiVersion": "v1",
 	"metadata": {
-		"name": "ruby-sample-build"
+		"name": "biocheck-build"
 	},
 	"spec": {
 		"runPolicy": "Serial",
@@ -25,21 +25,21 @@
 		],
 		"source": {
 			"git": {
-				"uri": "https://github.com/openshift/ruby-hello-world"
+				"uri": "https://github.com/rozguelstinsking/nginx_oc.git"
 			}
 		},
 		"strategy": {
-			"sourceStrategy": {
+			"customStrategy": {
 				"from": {
-					"kind": "ImageStreamTag",
-					"name": "ruby-20-centos7:latest"
+					"kind": "DockerImage",
+					"name": "docker.io/rosker/biocheck-front"
 				}
 			}
 		},
 		"output": {
 			"to": {
 				"kind": "ImageStreamTag",
-				"name": "origin-ruby-sample:latest"
+				"name": "biocheck-deploy:latest"
 			}
 		},
 		"postCommit": {
