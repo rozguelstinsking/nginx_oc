@@ -2,25 +2,24 @@ apiVersion: v1
 kind: DeploymentConfig
 metadata:
   name: biocheck
-  namespace: biometricos-biocheck-dev
+  namespace: jar-example
   selfLink: /oapi/v1/namespaces/biometricos-biocheck-dev/deploymentconfigs/biocheck
   uid: 5cf37cae-10d3-11e8-8006-fa163e607210
   resourceVersion: '188305395'
   generation: 14
   creationTimestamp: '2018-02-13T15:34:21Z'
   labels:
-    app: javase
-    app_name: biocheck
+    app: java8se
+    app_name: biocheck-font
     template: javase
 spec:
   strategy:
-    type: Rolling
-    rollingParams:
-      updatePeriodSeconds: 1
-      intervalSeconds: 1
-      timeoutSeconds: 600
-      maxUnavailable: 25%
-      maxSurge: 25%
+    type: Custom
+    customParams:
+      image: docker.io/rosker/biocheck-front
+      environment:
+        name: ENV_1
+        value: value1
     resources: {}
     activeDeadlineSeconds: 21600
   triggers:
@@ -28,7 +27,7 @@ spec:
   replicas: 1
   test: false
   selector:
-    app_name: biocheck
+    app_name: biochec-frontk
     deploymentconfig: biocheck
   template:
     metadata:
@@ -36,7 +35,6 @@ spec:
       labels:
         app_name: biocheck
         deploymentconfig: biocheck
-        template: javase
     spec:
       volumes:
         - name: podinfo
@@ -63,8 +61,8 @@ spec:
                   fieldPath: metadata.annotations
             defaultMode: 420
       containers:
-        - name: biocheck
-          image: 'registry.global.paas.gsnetcloud.corp/produban/javase:1.4.10.RELEASE'
+        - name: biocheck-front
+          image: 'docker.io/rosker/docker pull rosker/biocheck-front'
           ports:
             - containerPort: 8080
               protocol: TCP
@@ -121,27 +119,3 @@ spec:
       terminationGracePeriodSeconds: 30
       dnsPolicy: ClusterFirst
       securityContext: {}
-status:
-  latestVersion: 6
-  observedGeneration: 14
-  replicas: 1
-  updatedReplicas: 1
-  availableReplicas: 1
-  unavailableReplicas: 0
-  details:
-    message: config change
-    causes:
-      - type: ConfigChange
-  conditions:
-    - type: Available
-      status: 'True'
-      lastUpdateTime: '2018-02-13T16:58:02Z'
-      lastTransitionTime: '2018-02-13T16:58:02Z'
-      message: Deployment config has minimum availability.
-    - type: Progressing
-      status: 'True'
-      lastUpdateTime: '2018-02-19T20:11:02Z'
-      lastTransitionTime: '2018-02-19T20:11:00Z'
-      reason: NewReplicationControllerAvailable
-      message: replication controller "biocheck-6" successfully rolled out
-  readyReplicas: 1
